@@ -24,4 +24,8 @@ public class Address {
 
     @Column(name = "house_number")
     private String houseNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "app_user_id")
+    private AppUser appUser;
 }

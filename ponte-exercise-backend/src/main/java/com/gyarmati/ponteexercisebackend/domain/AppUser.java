@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -34,4 +35,10 @@ public class AppUser {
 
     @Column(name = "tax_identification_number")
     private String taxIdentificationNumber;
+
+    @OneToMany(mappedBy = "appUser")
+    private List<Address> addressList;
+
+    @OneToMany(mappedBy = "appUser")
+    private List<PhoneNumber> phoneNumberList;
 }

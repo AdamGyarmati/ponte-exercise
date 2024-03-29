@@ -17,4 +17,8 @@ public class PhoneNumber {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "app_user_id")
+    private AppUser appUser;
 }
