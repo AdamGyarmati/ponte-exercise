@@ -21,4 +21,9 @@ public class PhoneNumber {
     @ManyToOne
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
+
+    public PhoneNumber(String phoneNumber, AppUser appUser) {
+        this.phoneNumber = phoneNumber;
+        this.appUser = appUser;
+    }
 }

@@ -21,4 +21,9 @@ public class AppUserRole {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public AppUserRole(Role role, AppUser appUser) {
+        this.role = role;
+        this.appUser = appUser;
+    }
 }

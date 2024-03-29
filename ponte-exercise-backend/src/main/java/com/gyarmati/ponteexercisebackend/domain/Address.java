@@ -28,4 +28,12 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
+
+    public Address(String zipCode, String city, String street, String houseNumber, AppUser appUser) {
+        this.zipCode = zipCode;
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.appUser = appUser;
+    }
 }

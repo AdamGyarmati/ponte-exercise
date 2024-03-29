@@ -2,6 +2,7 @@ package com.gyarmati.ponteexercisebackend.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "app_user")
 public class AppUser {
     @Id
@@ -36,12 +38,12 @@ public class AppUser {
     @Column(name = "tax_identification_number")
     private String taxIdentificationNumber;
 
-    @OneToMany(mappedBy = "appUser")
+    @OneToMany(mappedBy = "appUser", cascade = CascadeType.PERSIST)
     private List<Address> addressList;
 
-    @OneToMany(mappedBy = "appUser")
+    @OneToMany(mappedBy = "appUser", cascade = CascadeType.PERSIST)
     private List<PhoneNumber> phoneNumberList;
 
-    @OneToMany(mappedBy = "appUser")
+    @OneToMany(mappedBy = "appUser", cascade = CascadeType.PERSIST)
     private List<AppUserRole> appUserRoleList;
 }
