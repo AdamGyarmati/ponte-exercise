@@ -35,10 +35,10 @@ public class AppUserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody @Valid UserRegisterDto userRegisterDto) {
+    public ResponseEntity<UserDetailsDto> register(@RequestBody @Valid UserRegisterDto userRegisterDto) {
         log.info("Http request POST /api/users/register with body: " + userRegisterDto.toString());
-        appUserService.register(userRegisterDto);
-        return new ResponseEntity<>(CREATED);
+        UserDetailsDto userDetailsDto = appUserService.register(userRegisterDto);
+        return new ResponseEntity<>(userDetailsDto, CREATED);
     }
 
     @PostMapping("/login")
@@ -47,6 +47,7 @@ public class AppUserController {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getName(), userLoginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
-        return new ResponseEntity<>(new UserDetailsDto(loggedInUser.getUsername(), loggedInUser.getUsername()), OK);
+        UserDetailsDto userDetailsDto = appUserService.getUserByName(loggedInUser.getUsername());
+        return new ResponseEntity<>(userDetailsDto, OK);
     }
 }

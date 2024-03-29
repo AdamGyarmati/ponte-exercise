@@ -1,6 +1,7 @@
 package com.gyarmati.ponteexercisebackend.service;
 
 import com.gyarmati.ponteexercisebackend.domain.*;
+import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
@@ -46,9 +47,24 @@ public class AppUserService implements UserDetailsService {
                 .build();
     }
 
-    public void register(UserRegisterDto userRegisterDto) {
+    public UserDetailsDto register(UserRegisterDto userRegisterDto) {
         AppUser appUser = mapUserRegisterDtoToAppUser(userRegisterDto);
-        appUserRepository.save(appUser);
+        AppUser savedAppUser = appUserRepository.save(appUser);
+        return mapAppUserToUserDetailsDto(savedAppUser);
+    }
+
+    private UserDetailsDto mapAppUserToUserDetailsDto(AppUser savedAppUser) {
+        return UserDetailsDto.builder()
+                .id(savedAppUser.getId())
+                .name(savedAppUser.getName())
+                .email(savedAppUser.getEmail())
+                .birthDate(savedAppUser.getBirthDate().toString())
+                .taxIdentificationNumber(savedAppUser.getTaxIdentificationNumber())
+                .socialSecurityNumber(savedAppUser.getSocialSecurityNumber())
+                .motherName(savedAppUser.getMotherName())
+                .rolesList(savedAppUser.getAppUserRoleList().stream()
+                        .map(role -> role.getRole().toString()).collect(Collectors.toList()))
+                .build();
     }
 
     private AppUser mapUserRegisterDtoToAppUser(UserRegisterDto userRegisterDto) {
@@ -93,5 +109,10 @@ public class AppUserService implements UserDetailsService {
                                 addressDto.getHouseNumber(),
                                 appUser))
                 .collect(Collectors.toList()));
+    }
+
+    public UserDetailsDto getUserByName(String name) {
+        AppUser appUser = appUserRepository.findByName(name);
+        return mapAppUserToUserDetailsDto(appUser);
     }
 }
