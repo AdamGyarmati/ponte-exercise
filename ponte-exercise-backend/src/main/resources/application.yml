@@ -8,7 +8,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=ponte
     username: postgres
     password: PontePostgresPW1!
     driver-class-name: org.postgresql.Driver
@@ -21,6 +21,10 @@ spring:
         show_sql: true
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: classpath:/db/changelog/app-changelog.xml
+    default-schema: ponte
 
 logging:
   level:
