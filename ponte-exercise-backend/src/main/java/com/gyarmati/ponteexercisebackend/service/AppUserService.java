@@ -2,6 +2,7 @@ package com.gyarmati.ponteexercisebackend.service;
 
 import com.gyarmati.ponteexercisebackend.domain.*;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -54,8 +55,7 @@ public class AppUserService implements UserDetailsService {
         if ((userRegisterDto.getEmail().isBlank() || userRegisterDto.getEmail() == null) &&
                 (userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber().isBlank()
                         || userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber() == null)) {
-            // TODO throw own exception
-            throw new RuntimeException();
+            throw new BothEmailAndPhoneNumberCantBeEmptyException("Both Email and Phone Number can't be empty!");
         }
 
         AppUser appUser = AppUser.builder()
