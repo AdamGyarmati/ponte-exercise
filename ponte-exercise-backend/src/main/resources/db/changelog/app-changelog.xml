@@ -4,4 +4,6 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <include file="db/changelog/scripts/create_address_table.sql"/>
+    <include file="db/changelog/scripts/create_phone_number_table.sql"/>
+    <include file="db/changelog/scripts/create_app_user_table.sql"/>
 </databaseChangeLog>
