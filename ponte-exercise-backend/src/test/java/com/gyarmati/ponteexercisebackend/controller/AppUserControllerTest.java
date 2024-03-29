@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gyarmati.ponteexercisebackend.domain.Role;
 import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
 import com.gyarmati.ponteexercisebackend.dto.UserLoginDto;
+import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
 import com.gyarmati.ponteexercisebackend.service.AppUserService;
 import org.hamcrest.CoreMatchers;
@@ -56,6 +57,8 @@ public class AppUserControllerTest {
 
     private UserDetailsDto userDetailsDto;
 
+    private UserRegisterByAdminDto userRegisterByAdminDto;
+
     private UserLoginDto userLoginDto;
 
     @BeforeEach
@@ -81,6 +84,11 @@ public class AppUserControllerTest {
                 .rolesList(List.of(Role.ROLE_ADMIN.toString()))
                 .build();
 
+        userRegisterByAdminDto = UserRegisterByAdminDto.builder()
+                .name("Béla")
+                .password("test1234")
+                .build();
+
         userLoginDto = UserLoginDto.builder()
                 .name("Peter")
                 .password("Peter1234")
@@ -97,6 +105,17 @@ public class AppUserControllerTest {
 
         response.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(userDetailsDto.getName())));
+    }
+
+    @Test
+    public void registerAppUserByAdmin_ReturnsCreated() throws Exception {
+        doNothing().when(appUserService).registerAppUserByAdmin(userRegisterByAdminDto);
+
+        ResultActions response = mvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userRegisterByAdminDto)));
+
+        response.andExpect(status().isCreated());
     }
 
 }

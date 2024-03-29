@@ -2,6 +2,7 @@ package com.gyarmati.ponteexercisebackend.service;
 
 import com.gyarmati.ponteexercisebackend.domain.*;
 import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
+import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
@@ -114,5 +115,13 @@ public class AppUserService implements UserDetailsService {
     public UserDetailsDto getUserByName(String name) {
         AppUser appUser = appUserRepository.findByName(name);
         return mapAppUserToUserDetailsDto(appUser);
+    }
+
+    public void registerAppUserByAdmin(UserRegisterByAdminDto userRegisterByAdminDto) {
+        AppUser appUser = AppUser.builder()
+                .name(userRegisterByAdminDto.getName())
+                .password(passwordEncoder.encode(userRegisterByAdminDto.getPassword()))
+                .build();
+        appUserRepository.save(appUser);
     }
 }

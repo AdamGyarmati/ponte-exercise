@@ -2,12 +2,14 @@ package com.gyarmati.ponteexercisebackend.controller;
 
 import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
 import com.gyarmati.ponteexercisebackend.dto.UserLoginDto;
+import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
 import com.gyarmati.ponteexercisebackend.service.AppUserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,6 +41,14 @@ public class AppUserController {
         log.info("Http request POST /api/users/register with body: " + userRegisterDto.toString());
         UserDetailsDto userDetailsDto = appUserService.register(userRegisterDto);
         return new ResponseEntity<>(userDetailsDto, CREATED);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> registerAppUserByAdmin(@RequestBody @Valid UserRegisterByAdminDto userRegisterByAdminDto) {
+        log.info("Http request POST /api/users with body: " + userRegisterByAdminDto.toString());
+        appUserService.registerAppUserByAdmin(userRegisterByAdminDto);
+        return new ResponseEntity<>(CREATED);
     }
 
     @PostMapping("/login")
