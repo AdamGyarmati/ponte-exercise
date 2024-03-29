@@ -1,12 +1,12 @@
 package com.gyarmati.ponteexercisebackend.domain;
 
-public enum UserRole {
+public enum Role {
     ROLE_USER("USER"),
     ROLE_ADMIN("ADMIN");
 
     private final String role;
 
-    UserRole(String role) {
+    Role(String role) {
         this.role = role;
     }
 

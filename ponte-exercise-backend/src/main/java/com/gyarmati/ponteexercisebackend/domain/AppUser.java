@@ -41,4 +41,7 @@ public class AppUser {
 
     @OneToMany(mappedBy = "appUser")
     private List<PhoneNumber> phoneNumberList;
+
+    @OneToMany(mappedBy = "appUser")
+    private List<AppUserRole> appUserRoleList;
 }
