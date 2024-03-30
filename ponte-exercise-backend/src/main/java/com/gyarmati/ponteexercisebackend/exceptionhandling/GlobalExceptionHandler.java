@@ -56,4 +56,20 @@ public class GlobalExceptionHandler {
         log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
         return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
     }
+
+    @ExceptionHandler(NameAlreadyTakenException.class)
+    public ResponseEntity<List<ValidationError>> nameAlreadyTakenException(NameAlreadyTakenException exception) {
+        ValidationError validationError = new ValidationError("name",
+                "Name is already taken: " + exception.getName());
+        log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
+        return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailAlreadyTakenException.class)
+    public ResponseEntity<List<ValidationError>> emailAlreadyTakenException(EmailAlreadyTakenException exception) {
+        ValidationError validationError = new ValidationError("name",
+                "Email is already taken: " + exception.getEmail());
+        log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
+        return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
+    }
 }

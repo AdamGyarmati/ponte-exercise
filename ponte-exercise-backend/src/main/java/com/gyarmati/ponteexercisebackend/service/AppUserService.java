@@ -3,6 +3,8 @@ package com.gyarmati.ponteexercisebackend.service;
 import com.gyarmati.ponteexercisebackend.domain.*;
 import com.gyarmati.ponteexercisebackend.dto.*;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.EmailAlreadyTakenException;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.NameAlreadyTakenException;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,12 @@ public class AppUserService implements UserDetailsService {
     }
 
     public UserDetailsDto register(UserRegisterDto userRegisterDto) {
+        if (appUserRepository.existsByName(userRegisterDto.getName())) {
+            throw new NameAlreadyTakenException(userRegisterDto.getName());
+        }
+        if (appUserRepository.existsByEmail(userRegisterDto.getEmail())) {
+            throw new EmailAlreadyTakenException(userRegisterDto.getEmail());
+        }
         AppUser appUser = mapUserRegisterDtoToAppUser(userRegisterDto);
         AppUser savedAppUser = appUserRepository.save(appUser);
         return mapAppUserToUserDetailsDto(savedAppUser);
