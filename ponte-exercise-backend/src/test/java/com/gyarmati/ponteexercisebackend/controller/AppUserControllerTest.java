@@ -23,9 +23,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +36,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -116,6 +120,18 @@ public class AppUserControllerTest {
                 .content(objectMapper.writeValueAsString(userRegisterByAdminDto)));
 
         response.andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser
+    public void deleteAppUser_ReturnsCreated() throws Exception {
+        doNothing().when(appUserService).delete("Peter");
+
+        ResultActions response = mvc.perform(delete("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userRegisterByAdminDto)));
+
+        response.andExpect(status().isNoContent());
     }
 
 }

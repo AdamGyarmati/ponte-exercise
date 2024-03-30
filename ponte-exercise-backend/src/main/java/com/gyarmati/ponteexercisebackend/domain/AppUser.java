@@ -38,12 +38,12 @@ public class AppUser {
     @Column(name = "tax_identification_number")
     private String taxIdentificationNumber;
 
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "appUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<Address> addressList;
 
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "appUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<PhoneNumber> phoneNumberList;
 
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "appUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<AppUserRole> appUserRoleList;
 }

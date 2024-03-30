@@ -26,9 +26,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BothEmailAndPhoneNumberCantBeEmptyException.class)
-    public ResponseEntity<List<ValidationError>> bothEmailAndPhoneNumberCantBeEmptyExceptionException(BothEmailAndPhoneNumberCantBeEmptyException exception) {
+    public ResponseEntity<List<ValidationError>> bothEmailAndPhoneNumberCantBeEmptyException(BothEmailAndPhoneNumberCantBeEmptyException exception) {
         ValidationError validationError = new ValidationError("message",
                 exception.getMessage());
+        log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
+        return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundByNameException.class)
+    public ResponseEntity<List<ValidationError>> userNotFoundByNameException(UserNotFoundByNameException exception) {
+        ValidationError validationError = new ValidationError("name",
+                "User not found with name: " + exception.getName());
         log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
         return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
     }

@@ -5,6 +5,7 @@ import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -122,6 +123,20 @@ public class AppUserService implements UserDetailsService {
                 .name(userRegisterByAdminDto.getName())
                 .password(passwordEncoder.encode(userRegisterByAdminDto.getPassword()))
                 .build();
+        setAppUserRoles(appUser);
         appUserRepository.save(appUser);
+    }
+
+    public void delete(String name) {
+        AppUser appUser = findByName(name);
+        appUserRepository.delete(appUser);
+    }
+
+    private AppUser findByName(String name) {
+        AppUser user = appUserRepository.findByName(name);
+        if (user == null) {
+            throw new UserNotFoundByNameException(name);
+        }
+        return user;
     }
 }

@@ -15,13 +15,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -59,5 +55,13 @@ public class AppUserController {
         UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
         UserDetailsDto userDetailsDto = appUserService.getUserByName(loggedInUser.getUsername());
         return new ResponseEntity<>(userDetailsDto, OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete() {
+        UserDetails loggedInUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("Http request DELETE /api/users with name: " + loggedInUser.getUsername());
+        appUserService.delete(loggedInUser.getUsername());
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }
