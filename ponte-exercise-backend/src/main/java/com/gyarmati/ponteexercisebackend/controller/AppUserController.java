@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
@@ -70,5 +72,14 @@ public class AppUserController {
         UserDetails loggedInUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetailsDto userDetailsDto = appUserService.update(loggedInUser.getUsername(), userUpdateDto);
         return new ResponseEntity<>(userDetailsDto, OK);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<UserDetailsDto>> getAllWithPage(@RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo,
+                                                               @RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize) {
+        log.info("Http request, GET /api/users");
+        List<UserDetailsDto> userDetailsDtoList = appUserService.listUserWithPage(pageNo, pageSize);
+        return new ResponseEntity<>(userDetailsDtoList, OK);
     }
 }

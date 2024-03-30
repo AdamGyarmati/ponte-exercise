@@ -7,6 +7,9 @@ import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameExc
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -94,6 +97,15 @@ public class AppUserService implements UserDetailsService {
 
         updateValuesForAppUser(userUpdateDto, appUser);
         return mapAppUserToUserDetailsDto(appUser);
+    }
+
+    public List<UserDetailsDto> listUserWithPage(Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<AppUser> appUserPage = appUserRepository.findAll(pageable);
+        List<AppUser> appUserList = appUserPage.getContent();
+        return appUserList.stream()
+                .map(this::mapAppUserToUserDetailsDto)
+                .collect(Collectors.toList());
     }
 
     private void updateValuesForAppUser(UserUpdateDto userUpdateDto, AppUser appUser) {
