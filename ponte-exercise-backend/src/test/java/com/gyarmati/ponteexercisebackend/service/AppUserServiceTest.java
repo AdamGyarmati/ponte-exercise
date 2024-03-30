@@ -1,8 +1,6 @@
 package com.gyarmati.ponteexercisebackend.service;
 
-import com.gyarmati.ponteexercisebackend.domain.AppUser;
-import com.gyarmati.ponteexercisebackend.domain.AppUserRole;
-import com.gyarmati.ponteexercisebackend.domain.Role;
+import com.gyarmati.ponteexercisebackend.domain.*;
 import com.gyarmati.ponteexercisebackend.dto.*;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
@@ -26,6 +27,12 @@ public class AppUserServiceTest {
     private AppUserRepository appUserRepository;
 
     @Mock
+    private AddressService addressService;
+
+    @Mock
+    private PhoneNumberService phoneNumberService;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
@@ -38,6 +45,8 @@ public class AppUserServiceTest {
     private UserDetailsDto userDetailsDto;
 
     private UserRegisterByAdminDto userRegisterByAdminDto;
+
+    private UserUpdateDto userUpdateDto;
 
     @BeforeEach
     public void init() {
@@ -52,6 +61,8 @@ public class AppUserServiceTest {
                 .taxIdentificationNumber("0000")
                 .build();
         appUser.setAppUserRoleList(List.of(new AppUserRole(Role.ROLE_ADMIN, appUser)));
+        appUser.setAddressList(List.of(new Address("1234", "Bp", "Babér", "23", appUser)));
+        appUser.setPhoneNumberList(List.of(new PhoneNumber(1L, "000", appUser)));
 
         userRegisterDto = UserRegisterDto.builder()
                 .name("Parker")
@@ -79,6 +90,20 @@ public class AppUserServiceTest {
         userRegisterByAdminDto = UserRegisterByAdminDto.builder()
                 .name("Béla")
                 .password("test1234")
+                .build();
+
+        userUpdateDto = UserUpdateDto.builder()
+                .name("Parker")
+                .email("peter@gmail.com")
+                .motherName("Peter Mama")
+                .password("Peter1234")
+                .birthDate("2000-01-01")
+                .socialSecurityNumber("0000")
+                .taxIdentificationNumber("0000")
+                .addressUpdateDtoList(
+                        List.of(
+                                new AddressUpdateDto(1L, "1234", "Bp", "Babér", "23")))
+                .phoneNumberUpdateDto(new PhoneNumberUpdateDto(1L, "0000"))
                 .build();
     }
 
@@ -117,5 +142,32 @@ public class AppUserServiceTest {
         appUserService.delete(appUser.getName());
 
         verify(appUserRepository, times(1)).delete(appUser);
+    }
+
+
+    @Test
+    public void updateUser_returnsUserDetailsDto() {
+        when(appUserRepository.findByName("Peter")).thenReturn(appUser);
+        when(addressService.findAddressesById(List.of(1L)))
+                .thenReturn(List.of(
+                        new Address("1234", "Bp", "Babér", "23", appUser)));
+
+        when(phoneNumberService.findPhoneNumberById(1L))
+                .thenReturn(new PhoneNumber(1L, "000", appUser));
+
+        UserDetailsDto userDetailsDto1 = appUserService.update("Peter", userUpdateDto);
+
+        assertThat(userDetailsDto1).isNotNull();
+    }
+
+    @Test
+    public void listUserWithPage_returnsListOfUserDetailsDto() {
+        Page<AppUser> appUserPage = Mockito.mock(Page.class);
+
+        when(appUserRepository.findAll(Mockito.any(Pageable.class))).thenReturn(appUserPage);
+
+        List<UserDetailsDto> userDetailsDtoList = appUserService.listUserWithPage(1, 2);
+
+        assertThat(userDetailsDtoList).isNotNull();
     }
 }
