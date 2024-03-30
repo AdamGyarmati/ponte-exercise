@@ -100,7 +100,7 @@ public class AppUserControllerTest {
     }
 
     @Test
-    public void registerAppUser_ReturnsCreated() throws Exception {
+    public void registerAppUser_returnsCreated() throws Exception {
         when(appUserService.register(userRegisterDto)).thenReturn(userDetailsDto);
 
         ResultActions response = mvc.perform(post("/api/users/register")
@@ -112,7 +112,7 @@ public class AppUserControllerTest {
     }
 
     @Test
-    public void registerAppUserByAdmin_ReturnsCreated() throws Exception {
+    public void registerAppUserByAdmin_returnsCreated() throws Exception {
         doNothing().when(appUserService).registerAppUserByAdmin(userRegisterByAdminDto);
 
         ResultActions response = mvc.perform(post("/api/users")
@@ -124,7 +124,7 @@ public class AppUserControllerTest {
 
     @Test
     @WithMockUser
-    public void deleteAppUser_ReturnsCreated() throws Exception {
+    public void deleteAppUser_returnsCreated() throws Exception {
         doNothing().when(appUserService).delete("Peter");
 
         ResultActions response = mvc.perform(delete("/api/users")

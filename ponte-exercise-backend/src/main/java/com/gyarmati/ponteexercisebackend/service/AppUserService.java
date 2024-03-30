@@ -55,6 +55,25 @@ public class AppUserService implements UserDetailsService {
         return mapAppUserToUserDetailsDto(savedAppUser);
     }
 
+    public UserDetailsDto getUserByName(String name) {
+        AppUser appUser = appUserRepository.findByName(name);
+        return mapAppUserToUserDetailsDto(appUser);
+    }
+
+    public void registerAppUserByAdmin(UserRegisterByAdminDto userRegisterByAdminDto) {
+        AppUser appUser = AppUser.builder()
+                .name(userRegisterByAdminDto.getName())
+                .password(passwordEncoder.encode(userRegisterByAdminDto.getPassword()))
+                .build();
+        setAppUserRoles(appUser);
+        appUserRepository.save(appUser);
+    }
+
+    public void delete(String name) {
+        AppUser appUser = findByName(name);
+        appUserRepository.delete(appUser);
+    }
+
     private UserDetailsDto mapAppUserToUserDetailsDto(AppUser savedAppUser) {
         return UserDetailsDto.builder()
                 .id(savedAppUser.getId())
@@ -111,25 +130,6 @@ public class AppUserService implements UserDetailsService {
                                 addressDto.getHouseNumber(),
                                 appUser))
                 .collect(Collectors.toList()));
-    }
-
-    public UserDetailsDto getUserByName(String name) {
-        AppUser appUser = appUserRepository.findByName(name);
-        return mapAppUserToUserDetailsDto(appUser);
-    }
-
-    public void registerAppUserByAdmin(UserRegisterByAdminDto userRegisterByAdminDto) {
-        AppUser appUser = AppUser.builder()
-                .name(userRegisterByAdminDto.getName())
-                .password(passwordEncoder.encode(userRegisterByAdminDto.getPassword()))
-                .build();
-        setAppUserRoles(appUser);
-        appUserRepository.save(appUser);
-    }
-
-    public void delete(String name) {
-        AppUser appUser = findByName(name);
-        appUserRepository.delete(appUser);
     }
 
     private AppUser findByName(String name) {

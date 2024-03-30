@@ -58,6 +58,7 @@ public class AppUserController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<Void> delete() {
         UserDetails loggedInUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         log.info("Http request DELETE /api/users with name: " + loggedInUser.getUsername());
