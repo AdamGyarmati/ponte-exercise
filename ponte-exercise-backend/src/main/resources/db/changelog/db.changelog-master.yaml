@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: gdb
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  autoIncrement: true
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: birthDate
+                  type: DATE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: motherName
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: socialSecurityNumber
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: taxIdentificationNumber
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
