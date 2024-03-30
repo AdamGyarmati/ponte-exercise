@@ -1,0 +1,53 @@
+<div class="custom-position"></div>
+<div class="container-fluid container mb-4 my-lg-4">
+  <h3 class="my-2 text-center">Login</h3>
+  <hr/>
+  <form [formGroup]="loginForm" class="mb-3" (ngSubmit)="submitLoginForm()">
+    <div class="my-2">
+      <label for="username" class="form-label label"
+             [ngClass]="{'text-danger':(loginForm.get('username')?.invalid && loginForm.get('username')?.touched) || loginForm.get('username')?.errors?.['serverError']}"
+      >
+
+        Username:
+      </label>
+      <input
+        id="username"
+        formControlName="username"
+        placeholder="Please give a username"
+        class="form-control input"
+        type="text">
+      <small *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched && !loginForm.get('username')?.errors?.['serverError']" class="text-danger">
+        You must give a name!
+      </small>
+    </div>
+    <small *ngIf="loginForm.get('username')?.errors?.['serverError']" class="text-danger">
+      {{loginForm.get('username')?.errors?.['serverError']}}
+    </small>
+    <div class="my-2">
+      <label for="password" class="form-label label"
+             [ngClass]="{'text-danger':(loginForm.get('password')?.invalid && loginForm.get('password')?.touched) || loginForm.get('password')?.errors?.['serverError']}"
+      >
+        Password:
+      </label>
+      <input
+        id="password"
+        formControlName="password"
+        placeholder="Please give a password"
+        class="form-control input"
+        type="password">
+      <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched && !loginForm.get('password')?.errors?.['serverError']" class="text-danger">
+        You must give a password!
+      </small>
+      <small *ngIf="loginForm.get('password')?.errors?.['serverError']" class="text-danger">
+        {{loginForm.get('password')?.errors?.['serverError']}}
+      </small>
+      <br/>
+      <div *ngIf="invalidLogin" class="alert alert-danger" role="alert">
+        Incorrect email or password!
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn button">Login</button>
+    </div>
+  </form>
+</div>

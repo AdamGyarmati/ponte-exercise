@@ -46,11 +46,10 @@ public class AppUserController {
         return new ResponseEntity<>(CREATED);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserDetailsDto> login(@RequestBody UserLoginDto userLoginDto) {
-        log.info("Http request POST /api/users/login with body: " + userLoginDto.toString());
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getName(), userLoginDto.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    @GetMapping("/login")
+    public ResponseEntity<UserDetailsDto> login() {
+        log.info("Http request GET /api/users/login");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
         UserDetailsDto userDetailsDto = appUserService.getUserByName(loggedInUser.getUsername());
         return new ResponseEntity<>(userDetailsDto, OK);
