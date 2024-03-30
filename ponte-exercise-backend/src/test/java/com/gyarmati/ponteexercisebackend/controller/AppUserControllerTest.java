@@ -2,10 +2,7 @@ package com.gyarmati.ponteexercisebackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gyarmati.ponteexercisebackend.domain.Role;
-import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
-import com.gyarmati.ponteexercisebackend.dto.UserLoginDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
+import com.gyarmati.ponteexercisebackend.dto.*;
 import com.gyarmati.ponteexercisebackend.service.AppUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +23,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,6 +48,8 @@ public class AppUserControllerTest {
     private UserDetailsDto userDetailsDto;
 
     private UserRegisterByAdminDto userRegisterByAdminDto;
+
+    private UserUpdateDto userUpdateDto;
 
     private UserLoginDto userLoginDto;
 
@@ -81,6 +79,16 @@ public class AppUserControllerTest {
         userRegisterByAdminDto = UserRegisterByAdminDto.builder()
                 .name("Béla")
                 .password("test1234")
+                .build();
+
+        userUpdateDto = UserUpdateDto.builder()
+                .name("Parker")
+                .email("peter@gmail.com")
+                .motherName("Peter Mama")
+                .password("Peter1234")
+                .birthDate("2000-01-01")
+                .socialSecurityNumber("0000")
+                .taxIdentificationNumber("0000")
                 .build();
 
         userLoginDto = UserLoginDto.builder()
@@ -114,7 +122,7 @@ public class AppUserControllerTest {
 
     @Test
     @WithMockUser
-    public void deleteAppUser_returnsCreated() throws Exception {
+    public void deleteAppUser_returnsNoContent() throws Exception {
         doNothing().when(appUserService).delete("Peter");
 
         ResultActions response = mvc.perform(delete("/api/users")
@@ -124,4 +132,28 @@ public class AppUserControllerTest {
         response.andExpect(status().isNoContent());
     }
 
+    @Test
+    @WithMockUser
+    public void updateAppUser_returnsOk() throws Exception {
+        when(appUserService.update("Peter", userUpdateDto)).thenReturn(userDetailsDto);
+
+        ResultActions response = mvc.perform(put("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userUpdateDto)));
+
+        response.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void getAllAppUserWithPage_returnsOk() throws Exception {
+        when(appUserService.listUserWithPage(0, 2)).thenReturn(List.of(userDetailsDto));
+
+        ResultActions response = mvc.perform(get("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .param("pageNo", "0")
+                        .param("pageSize", "2"));
+
+        response.andExpect(status().isOk());
+    }
 }
