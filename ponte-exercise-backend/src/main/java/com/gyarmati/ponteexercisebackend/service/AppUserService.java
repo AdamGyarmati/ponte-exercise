@@ -1,9 +1,7 @@
 package com.gyarmati.ponteexercisebackend.service;
 
 import com.gyarmati.ponteexercisebackend.domain.*;
-import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
+import com.gyarmati.ponteexercisebackend.dto.*;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
@@ -27,11 +25,15 @@ import java.util.stream.Collectors;
 public class AppUserService implements UserDetailsService {
 
     private final AppUserRepository appUserRepository;
+    private final AddressService addressService;
+    private final PhoneNumberService phoneNumberService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AppUserService(AppUserRepository appUserRepository, @Lazy PasswordEncoder passwordEncoder) {
+    public AppUserService(AppUserRepository appUserRepository, AddressService addressService, PhoneNumberService phoneNumberService, @Lazy PasswordEncoder passwordEncoder) {
         this.appUserRepository = appUserRepository;
+        this.addressService = addressService;
+        this.phoneNumberService = phoneNumberService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -74,6 +76,36 @@ public class AppUserService implements UserDetailsService {
         appUserRepository.delete(appUser);
     }
 
+    public UserDetailsDto update(String name, UserUpdateDto userUpdateDto) {
+        if ((userUpdateDto.getEmail().isBlank() || userUpdateDto.getEmail() == null) &&
+                (userUpdateDto.getPhoneNumberUpdateDto().getPhoneNumber().isBlank()
+                        || userUpdateDto.getPhoneNumberUpdateDto().getPhoneNumber() == null)) {
+            throw new BothEmailAndPhoneNumberCantBeEmptyException("Both Email and Phone Number can't be empty!");
+        }
+        AppUser appUser = findByName(name);
+        List<Long> addressIdList = userUpdateDto.getAddressUpdateDtoList().stream()
+                .map(AddressUpdateDto::getId)
+                .toList();
+        List<Address> address = addressService.findAddressesById(addressIdList);
+        PhoneNumber phoneNumber = phoneNumberService.findPhoneNumberById(userUpdateDto.getPhoneNumberUpdateDto().getId());
+
+        addressService.updateAddresses(address, userUpdateDto.getAddressUpdateDtoList());
+        phoneNumberService.updatePhoneNumber(phoneNumber, userUpdateDto.getPhoneNumberUpdateDto());
+
+        updateValuesForAppUser(userUpdateDto, appUser);
+        return mapAppUserToUserDetailsDto(appUser);
+    }
+
+    private void updateValuesForAppUser(UserUpdateDto userUpdateDto, AppUser appUser) {
+        appUser.setName(userUpdateDto.getName());
+        appUser.setEmail(userUpdateDto.getEmail());
+        appUser.setBirthDate(LocalDate.parse(userUpdateDto.getBirthDate()));
+        appUser.setMotherName(userUpdateDto.getMotherName());
+        appUser.setPassword(passwordEncoder.encode(userUpdateDto.getPassword()));
+        appUser.setSocialSecurityNumber(userUpdateDto.getSocialSecurityNumber());
+        appUser.setTaxIdentificationNumber(userUpdateDto.getTaxIdentificationNumber());
+    }
+
     private UserDetailsDto mapAppUserToUserDetailsDto(AppUser savedAppUser) {
         return UserDetailsDto.builder()
                 .id(savedAppUser.getId())
@@ -85,6 +117,12 @@ public class AppUserService implements UserDetailsService {
                 .motherName(savedAppUser.getMotherName())
                 .rolesList(savedAppUser.getAppUserRoleList().stream()
                         .map(role -> role.getRole().toString()).collect(Collectors.toList()))
+                .addressDetailsDtosList(savedAppUser.getAddressList().stream()
+                        .map(addressService::mapAddressToAddressDetailsDto)
+                        .collect(Collectors.toList()))
+                .phoneNumberDetailsDtoList(savedAppUser.getPhoneNumberList().stream()
+                        .map(phoneNumberService::mapPhoneNumberToPhoneNumberDetailsDto)
+                        .collect(Collectors.toList()))
                 .build();
     }
 

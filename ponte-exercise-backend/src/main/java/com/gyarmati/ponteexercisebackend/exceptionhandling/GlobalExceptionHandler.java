@@ -40,4 +40,20 @@ public class GlobalExceptionHandler {
         log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
         return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
     }
+
+    @ExceptionHandler(PhoneNumberNotFoundByIdException.class)
+    public ResponseEntity<List<ValidationError>> phoneNumberNotFoundByIdException(PhoneNumberNotFoundByIdException exception) {
+        ValidationError validationError = new ValidationError("id",
+                "Phone number not found with id: " + exception.getPhoneNumberId());
+        log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
+        return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<List<ValidationError>> addressNotFoundException(AddressNotFoundException exception) {
+        ValidationError validationError = new ValidationError("address",
+                "Address not found");
+        log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
+        return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
+    }
 }

@@ -1,9 +1,6 @@
 package com.gyarmati.ponteexercisebackend.controller;
 
-import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
-import com.gyarmati.ponteexercisebackend.dto.UserLoginDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
+import com.gyarmati.ponteexercisebackend.dto.*;
 import com.gyarmati.ponteexercisebackend.service.AppUserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -64,5 +61,14 @@ public class AppUserController {
         log.info("Http request DELETE /api/users with name: " + loggedInUser.getUsername());
         appUserService.delete(loggedInUser.getUsername());
         return new ResponseEntity<>(NO_CONTENT);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    public ResponseEntity<UserDetailsDto> update(@RequestBody @Valid UserUpdateDto userUpdateDto) {
+        log.info("Http request PUT /api/users with body: " + userUpdateDto.toString());
+        UserDetails loggedInUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsDto userDetailsDto = appUserService.update(loggedInUser.getUsername(), userUpdateDto);
+        return new ResponseEntity<>(userDetailsDto, OK);
     }
 }

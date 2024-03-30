@@ -20,4 +20,6 @@ public class UserDetailsDto {
     private String socialSecurityNumber;
     private String taxIdentificationNumber;
     private List<String> rolesList;
+    private List<AddressDetailsDto> addressDetailsDtosList;
+    private List<PhoneNumberDetailsDto> phoneNumberDetailsDtoList;
 }
