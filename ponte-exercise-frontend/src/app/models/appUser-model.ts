@@ -6,6 +6,7 @@ export interface AppUserModel {
   name: string,
   email: string,
   motherName: string,
+  birthDate: string,
   socialSecurityNumber: string,
   taxIdentificationNumber: string,
   rolesList: string[],

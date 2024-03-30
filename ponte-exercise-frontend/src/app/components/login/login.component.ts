@@ -28,7 +28,6 @@ export class LoginComponent {
     const data = {...this.loginForm.value};
     this.authService.authenticate(data).subscribe({
       next: (response) => {
-        localStorage.setItem('user', JSON.stringify(response));
         this.router.navigate(['/me']);
       },
       error: (error) => {

@@ -1,0 +1,179 @@
+<div class="custom-position"></div>
+<div class="container-fluid container mb-4 my-lg-4">
+  <h3 class="my-2 text-center">Account details</h3>
+  <hr/>
+  <form [formGroup]="userForm" class="mb-3">
+    <!--        (ngSubmit)="submituserForm()"-->
+
+    <div class="my-2">
+      <label for="name" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('name')?.invalid && userForm.get('name')?.touched) || userForm.get('name')?.errors?.['serverError']}"
+      >
+
+        Username:
+      </label>
+      <input
+        id="name"
+        formControlName="name"
+        placeholder="Please give a name"
+        class="form-control input"
+        type="text">
+      <small
+        *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.touched && !userForm.get('name')?.errors?.['serverError']"
+        class="text-danger">
+        You must give a name!
+      </small>
+    </div>
+    <small *ngIf="userForm.get('name')?.errors?.['serverError']" class="text-danger">
+      {{userForm.get('name')?.errors?.['serverError']}}
+    </small>
+
+    <div class="my-2">
+      <label for="email" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('email')?.invalid && userForm.get('email')?.touched) || userForm.get('email')?.errors?.['serverError']}"
+      >
+
+        Email:
+      </label>
+      <input
+        id="email"
+        formControlName="email"
+        placeholder="Please give an email"
+        class="form-control input"
+        type="email">
+      <small
+        *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched && !userForm.get('email')?.errors?.['serverError']"
+        class="text-danger">
+        You must give an email!
+      </small>
+    </div>
+    <small *ngIf="userForm.get('email')?.errors?.['serverError']" class="text-danger">
+      {{userForm.get('email')?.errors?.['serverError']}}
+    </small>
+
+    <div class="my-2">
+      <label for="password" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('password')?.invalid && userForm.get('password')?.touched) || userForm.get('password')?.errors?.['serverError']}"
+      >
+        Password:
+      </label>
+      <input
+        id="password"
+        formControlName="password"
+        placeholder="Please give a password"
+        class="form-control input"
+        type="password">
+      <small
+        *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched && !userForm.get('password')?.errors?.['serverError']"
+        class="text-danger">
+        You must give a password!
+      </small>
+      <small *ngIf="userForm.get('password')?.errors?.['serverError']" class="text-danger">
+        {{userForm.get('password')?.errors?.['serverError']}}
+      </small>
+      <br/>
+      <!--      <div *ngIf="invalidLogin" class="alert alert-danger" role="alert">-->
+      <!--        Incorrect email or password!-->
+      <!--      </div>-->
+    </div>
+
+
+    <div class="my-2">
+      <label for="birthDate" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('birthDate')?.invalid && userForm.get('birthDate')?.touched) || userForm.get('birthDate')?.errors?.['serverError']}"
+      >
+
+        Birth Date:
+      </label>
+      <input
+        id="birthDate"
+        formControlName="birthDate"
+        placeholder="Please give an birth date"
+        class="form-control input"
+        type="date">
+      <small
+        *ngIf="userForm.get('birthDate')?.invalid && userForm.get('birthDate')?.touched && !userForm.get('birthDate')?.errors?.['serverError']"
+        class="text-danger">
+        You must give an birth date!
+      </small>
+    </div>
+    <small *ngIf="userForm.get('birthDate')?.errors?.['serverError']" class="text-danger">
+      {{userForm.get('birthDate')?.errors?.['serverError']}}
+    </small>
+
+
+    <div class="my-2">
+      <label for="motherName" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('motherName')?.invalid && userForm.get('motherName')?.touched) || userForm.get('motherName')?.errors?.['serverError']}"
+      >
+
+        Mother name:
+      </label>
+      <input
+        id="motherName"
+        formControlName="motherName"
+        placeholder="Please give an mother name"
+        class="form-control input"
+        type="text">
+      <small
+        *ngIf="userForm.get('motherName')?.invalid && userForm.get('motherName')?.touched && !userForm.get('motherName')?.errors?.['serverError']"
+        class="text-danger">
+        You must give an mother name!
+      </small>
+    </div>
+    <small *ngIf="userForm.get('motherName')?.errors?.['serverError']" class="text-danger">
+      {{userForm.get('motherName')?.errors?.['serverError']}}
+    </small>
+
+
+    <div class="my-2">
+      <label for="socialSecurityNumber" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('socialSecurityNumber')?.invalid && userForm.get('socialSecurityNumber')?.touched) || userForm.get('socialSecurityNumber')?.errors?.['serverError']}"
+      >
+
+        Social Security Number:
+      </label>
+      <input
+        id="socialSecurityNumber"
+        formControlName="socialSecurityNumber"
+        placeholder="Please give an social security number"
+        class="form-control input"
+        type="number">
+      <small
+        *ngIf="userForm.get('socialSecurityNumber')?.invalid && userForm.get('socialSecurityNumber')?.touched && !userForm.get('socialSecurityNumber')?.errors?.['serverError']"
+        class="text-danger">
+        You must give an social security number!
+      </small>
+    </div>
+    <small *ngIf="userForm.get('socialSecurityNumber')?.errors?.['serverError']" class="text-danger">
+      {{userForm.get('socialSecurityNumber')?.errors?.['serverError']}}
+    </small>
+
+
+    <div class="my-2">
+      <label for="taxIdentificationNumber" class="form-label label"
+             [ngClass]="{'text-danger':(userForm.get('taxIdentificationNumber')?.invalid && userForm.get('taxIdentificationNumber')?.touched) || userForm.get('taxIdentificationNumber')?.errors?.['serverError']}"
+      >
+
+        Tax Identification Number:
+      </label>
+      <input
+        id="taxIdentificationNumber"
+        formControlName="taxIdentificationNumber"
+        placeholder="Please give an social tax identification number"
+        class="form-control input"
+        type="number">
+      <small
+        *ngIf="userForm.get('taxIdentificationNumber')?.invalid && userForm.get('taxIdentificationNumber')?.touched && !userForm.get('taxIdentificationNumber')?.errors?.['serverError']"
+        class="text-danger">
+        You must give an social tax identification number!
+      </small>
+    </div>
+    <small *ngIf="userForm.get('taxIdentificationNumber')?.errors?.['serverError']" class="text-danger">
+      {{userForm.get('taxIdentificationNumber')?.errors?.['serverError']}}
+    </small>
+    <div class="text-center">
+      <button type="submit" class="btn button">Modify</button>
+    </div>
+  </form>
+</div>
