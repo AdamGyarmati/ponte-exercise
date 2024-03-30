@@ -12,7 +12,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:4200")
                 .allowedMethods("GET", "POST", "DELETE", "PUT")
                 .allowedHeaders("Authorization", "Cache-Control", "Content-Type", "X-Requested-With")
-                .allowCredentials(true)
-        ;
+                .allowCredentials(true);
     }
 }

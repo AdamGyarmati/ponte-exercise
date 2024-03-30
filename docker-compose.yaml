@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    image: 'ponte-backend:latest'
+    build:
+      context: ./ponte-exercise-backend
+    container_name: ponte-backend
+    depends_on:
+      - postgres_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=PontePostgresPW1!
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=PontePostgresPW1!
+
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./liquibase:/liquibase/changelog
+
+  postgres_db:
+    image: postgres
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=PontePostgresPW1!
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+
+
+  frontend:
+    image: 'ponte-frontend:latest'
+    build:
+      context: ./ponte-exercise-frontend
+    container_name: ponte-frontend
+    ports:
+      - "4200:80"
