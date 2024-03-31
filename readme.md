@@ -39,9 +39,13 @@ Adatbázisnak Postgres 15 alpine docker image-et használtam: <br/>
 Adatbázis verziókövető rendszernek Liquibase-t használtam.
 
 ### Program indítása
-A projekt főkönyvtárán a ```docker-compose up``` paranccsal indul a program. Készül egy 
+- A projekt főkönyvtárán a ```docker-compose up``` paranccsal indul a program. Készül egy 
 backend container(```ponte-backend```), frontend container(```ponte-fronted```) és postgres adatbázis(```postgres_db```). <br/>
-A resources mappába bekészítettem egy postman collection-t.
+- A resources mappába bekészítettem egy postman collection-t.
+- A program indulásakor lefut a DatabaseInitializer-ben megírt CommandLineRunner és 2 User-t belerak az adatbázisba. 
+  - Admin User: ```Name: John Doe``` ```Password: test1234```
+  - Sima User: ```Name: Jane Doe``` ```Password: test1234```
+
 
 ### Hátralevő fejlesztések
 - Swagger-t nem tudtam működésre bírni, bent hagytam a dependency-t valamint a securityben a configját. Ha erre kaphatok visszajelzést, hogy hol a hiba azt megköszönöm.

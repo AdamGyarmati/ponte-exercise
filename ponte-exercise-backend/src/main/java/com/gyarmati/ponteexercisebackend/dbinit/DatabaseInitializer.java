@@ -119,7 +119,9 @@ public class DatabaseInitializer implements CommandLineRunner {
         phoneNumber4.setAppUser(appUser2);
         appUserRole3.setAppUser(appUser2);
 
-        appUserRepository.save(appUser1);
-        appUserRepository.save(appUser2);
+        if (appUserRepository.findAll().size() == 0) {
+            appUserRepository.save(appUser1);
+            appUserRepository.save(appUser2);
+        }
     }
 }
