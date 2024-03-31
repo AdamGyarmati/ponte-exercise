@@ -4,12 +4,10 @@ import com.gyarmati.ponteexercisebackend.dto.AddressRegisterDto;
 import com.gyarmati.ponteexercisebackend.dto.PhoneNumberRegisterDto;
 import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
 import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
-import com.gyarmati.ponteexercisebackend.service.AppUserService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -43,9 +41,6 @@ public class ITAppUserControllerTest {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
-    @Autowired
-    private AppUserService appUserService;
-
     @BeforeAll
     static void beforeAll() {
         postgres.start();
@@ -73,7 +68,7 @@ public class ITAppUserControllerTest {
                 .socialSecurityNumber("0000")
                 .taxIdentificationNumber("0000")
                 .addressRegisterDtoList(List.of(new AddressRegisterDto("1111", "Budapest", "Babér", "23")))
-                .phoneNumberRegisterDto(new PhoneNumberRegisterDto("11111111"))
+                .phoneNumberRegisterDtoList(List.of(new PhoneNumberRegisterDto("11111111")))
                 .build();
 
         UserDetailsDto userDetailsDto1 = restTemplate.postForObject(baseUrl + "/register", userRegisterDto, UserDetailsDto.class);

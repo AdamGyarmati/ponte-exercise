@@ -43,8 +43,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PhoneNumberNotFoundByIdException.class)
     public ResponseEntity<List<ValidationError>> phoneNumberNotFoundByIdException(PhoneNumberNotFoundByIdException exception) {
-        ValidationError validationError = new ValidationError("id",
-                "Phone number not found with id: " + exception.getPhoneNumberId());
+        ValidationError validationError = new ValidationError("message",
+                "Phone number not found");
         log.error("Error in validation: " + validationError.getField() + ": " + validationError.getErrorMessage());
         return new ResponseEntity<>(List.of(validationError), BAD_REQUEST);
     }

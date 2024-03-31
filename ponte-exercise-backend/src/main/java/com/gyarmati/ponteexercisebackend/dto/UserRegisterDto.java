@@ -45,7 +45,7 @@ public class UserRegisterDto {
     @NotBlank
     private String taxIdentificationNumber;
 
-    private PhoneNumberRegisterDto phoneNumberRegisterDto;
+    private List<PhoneNumberRegisterDto> phoneNumberRegisterDtoList;
 
     private List<AddressRegisterDto> addressRegisterDtoList;
 }

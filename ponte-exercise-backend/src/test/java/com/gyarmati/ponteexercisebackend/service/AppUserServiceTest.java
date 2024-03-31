@@ -7,8 +7,6 @@ import com.gyarmati.ponteexercisebackend.exceptionhandling.EmailAlreadyTakenExce
 import com.gyarmati.ponteexercisebackend.exceptionhandling.NameAlreadyTakenException;
 import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +47,6 @@ public class AppUserServiceTest {
 
     private UserRegisterDto userRegisterDto;
 
-    private UserDetailsDto userDetailsDto;
 
     private UserRegisterByAdminDto userRegisterByAdminDto;
 
@@ -80,18 +77,7 @@ public class AppUserServiceTest {
                 .socialSecurityNumber("0000")
                 .taxIdentificationNumber("0000")
                 .addressRegisterDtoList(List.of(new AddressRegisterDto("1111", "Budapest", "Babér", "23")))
-                .phoneNumberRegisterDto(new PhoneNumberRegisterDto("11111111"))
-                .build();
-
-        userDetailsDto = UserDetailsDto.builder()
-                .id(1L)
-                .name("Parker")
-                .email("peter@gmail.com")
-                .motherName("Peter Mama")
-                .birthDate("2000-01-01")
-                .socialSecurityNumber("0000")
-                .taxIdentificationNumber("0000")
-                .rolesList(List.of(Role.ROLE_ADMIN.toString()))
+                .phoneNumberRegisterDtoList(List.of(new PhoneNumberRegisterDto("11111111")))
                 .build();
 
         userRegisterByAdminDto = UserRegisterByAdminDto.builder()
@@ -110,7 +96,7 @@ public class AppUserServiceTest {
                 .addressUpdateDtoList(
                         List.of(
                                 new AddressUpdateDto(1L, "1234", "Bp", "Babér", "23")))
-                .phoneNumberUpdateDto(new PhoneNumberUpdateDto(1L, "0000"))
+                .phoneNumberUpdateDtoList(List.of(new PhoneNumberUpdateDto(1L, "0000")))
                 .build();
     }
 
@@ -173,8 +159,9 @@ public class AppUserServiceTest {
                 .thenReturn(List.of(
                         new Address("1234", "Bp", "Babér", "23", appUser)));
 
-        when(phoneNumberService.findPhoneNumberById(1L))
-                .thenReturn(new PhoneNumber(1L, "000", appUser));
+        when(phoneNumberService.findPhoneNumbersById(List.of(1L)))
+                .thenReturn(List.of(
+                        new PhoneNumber(1L, "000", appUser)));
 
         UserDetailsDto userDetailsDto1 = appUserService.update("Peter", userUpdateDto);
 
@@ -184,7 +171,7 @@ public class AppUserServiceTest {
     @Test
     public void updateUser_returnsBothEmailAndPhoneNumberCantBeEmptyException() {
         userUpdateDto.setEmail(null);
-        userUpdateDto.getPhoneNumberUpdateDto().setPhoneNumber(null);
+        userUpdateDto.getPhoneNumberUpdateDtoList().get(0).setPhoneNumber(null);
         assertThrows(BothEmailAndPhoneNumberCantBeEmptyException.class, () -> appUserService.update("Peter", userUpdateDto));
     }
 

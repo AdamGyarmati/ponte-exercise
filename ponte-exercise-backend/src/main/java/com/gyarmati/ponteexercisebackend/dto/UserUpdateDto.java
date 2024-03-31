@@ -45,7 +45,7 @@ public class UserUpdateDto {
     @NotBlank
     private String taxIdentificationNumber;
 
-    private PhoneNumberUpdateDto phoneNumberUpdateDto;
+    private List<PhoneNumberUpdateDto> phoneNumberUpdateDtoList;
 
     private List<AddressUpdateDto> addressUpdateDtoList;
 }

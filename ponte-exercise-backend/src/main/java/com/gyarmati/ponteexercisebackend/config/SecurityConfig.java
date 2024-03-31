@@ -41,24 +41,7 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(req ->
                         req
-                                .requestMatchers(
-                                        "/api/v1/auth/**",
-                                        "/v2/api-docs",
-                                        "/v3/api-docs",
-                                        "/v3/api-docs/**",
-                                        "/swagger-resources",
-                                        "/swagger-resources/**",
-                                        "/configuration/ui",
-                                        "/configuration/security",
-                                        "/swagger-ui/**",
-                                        "/webjars/**",
-                                        "/swagger-ui.html"
-                                )
-                                .permitAll()
-                                .requestMatchers(
-                                        "/api/users/login",
-                                        "/api/users/register",
-                                        "/api/users/")
+                                .requestMatchers(AUTH_WHITELIST)
                                 .permitAll()
                                 .anyRequest().authenticated());
         return http.build();

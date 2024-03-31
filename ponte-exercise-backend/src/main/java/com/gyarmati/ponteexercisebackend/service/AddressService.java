@@ -24,6 +24,10 @@ public class AddressService {
 
     public List<Address> findAddressesById(List<Long> addressIdList) {
         List<Address> byAddressIdIn = addressRepository.findByIdIn(addressIdList);
+        /*
+        * Megnézzük hogy a beérkező AddressUpdateDto-nak az id listája ugyan akkora-e mint az Id-k alapján kikért Addressek listájának a mérete.
+        * Ha nem ugyan akkora akkor olyan id is jött amilyen id-val nincs Address a db-ben.
+        */
         if (addressIdList.size() != byAddressIdIn.size()) {
             throw new AddressNotFoundException();
         }
@@ -31,6 +35,10 @@ public class AddressService {
     }
 
     public void updateAddresses(List<Address> addressList, List<AddressUpdateDto> addressUpdateDtoList) {
+        /*
+         * Itt azért iterálok rajtuk végig és végzem el az if vizsgálatot id-ra hogy biztosan az ugyan azzal az id-val rendelkező Address-t
+         * updatelem az AddressUpdateDto-val
+         */
         for (Address address : addressList) {
             for (AddressUpdateDto addressUpdateDto : addressUpdateDtoList) {
                 if (address.getId().equals(addressUpdateDto.getId())) {
@@ -38,13 +46,6 @@ public class AddressService {
                 }
             }
         }
-    }
-
-    private void updateValuesForAddress(Address address, AddressUpdateDto addressUpdateDto) {
-        address.setCity(addressUpdateDto.getCity());
-        address.setStreet(addressUpdateDto.getStreet());
-        address.setZipCode(addressUpdateDto.getZipCode());
-        address.setHouseNumber(address.getHouseNumber());
     }
 
     public AddressDetailsDto mapAddressToAddressDetailsDto(Address address) {
@@ -55,5 +56,12 @@ public class AddressService {
                 .zipCode(address.getZipCode())
                 .street(address.getStreet())
                 .build();
+    }
+
+    private void updateValuesForAddress(Address address, AddressUpdateDto addressUpdateDto) {
+        address.setCity(addressUpdateDto.getCity());
+        address.setStreet(addressUpdateDto.getStreet());
+        address.setZipCode(addressUpdateDto.getZipCode());
+        address.setHouseNumber(address.getHouseNumber());
     }
 }

@@ -63,17 +63,8 @@ public class AppUserService implements UserDetailsService {
         return mapAppUserToUserDetailsDto(savedAppUser);
     }
 
-    private void checkNameAndEmailIsTaken(String name, String email) {
-        if (appUserRepository.existsByName(name)) {
-            throw new NameAlreadyTakenException(name);
-        }
-        if (appUserRepository.existsByEmail(email)) {
-            throw new EmailAlreadyTakenException(email);
-        }
-    }
-
     public UserDetailsDto getUserByName(String name) {
-        AppUser appUser = appUserRepository.findByName(name);
+        AppUser appUser = findByNameOrThrowException(name);
         return mapAppUserToUserDetailsDto(appUser);
     }
 
@@ -87,22 +78,43 @@ public class AppUserService implements UserDetailsService {
     }
 
     public void delete(String name) {
-        AppUser appUser = findByName(name);
+        AppUser appUser = findByNameOrThrowException(name);
         appUserRepository.delete(appUser);
     }
 
     public UserDetailsDto update(String name, UserUpdateDto userUpdateDto) {
-        checkEmailOrPhoneNumberIsBlankOrNull(userUpdateDto.getEmail(), userUpdateDto.getPhoneNumberUpdateDto().getPhoneNumber());
+        checkEmailOrPhoneNumberIsBlankOrNull(
+                userUpdateDto.getEmail(),
+                /*
+                 * Itt a PhoneNumberRegisterDto-ból kiszedjük a PhoneNumbert-t és String listaként adjuk tovább
+                 */
+                userUpdateDto.getPhoneNumberUpdateDtoList()
+                        .stream()
+                        .map(PhoneNumberUpdateDto::getPhoneNumber)
+                        .collect(Collectors.toList()));
+
         checkNameAndEmailIsTaken(userUpdateDto.getName(), userUpdateDto.getEmail());
-        AppUser appUser = findByName(name);
+
+        AppUser appUser = findByNameOrThrowException(name);
+
+        /*
+         * Itt a kiszedjük UserUpdateDto dto AddressUpdateDtoList address listájából az Id-kat és utána az alapján keresünk Addresseket
+         */
         List<Long> addressIdList = userUpdateDto.getAddressUpdateDtoList().stream()
                 .map(AddressUpdateDto::getId)
                 .toList();
-        List<Address> address = addressService.findAddressesById(addressIdList);
-        PhoneNumber phoneNumber = phoneNumberService.findPhoneNumberById(userUpdateDto.getPhoneNumberUpdateDto().getId());
+        List<Address> addresses = addressService.findAddressesById(addressIdList);
 
-        addressService.updateAddresses(address, userUpdateDto.getAddressUpdateDtoList());
-        phoneNumberService.updatePhoneNumber(phoneNumber, userUpdateDto.getPhoneNumberUpdateDto());
+        /*
+         * Itt a kiszedjük UserUpdateDto dto PhoneNumberUpdateDtoList phoneNumber listájából az Id-kat és utána az alapján keresünk PhioneNumber-ket
+         */
+        List<Long> phoneNumberList = userUpdateDto.getPhoneNumberUpdateDtoList().stream()
+                .map(PhoneNumberUpdateDto::getId)
+                .toList();
+        List<PhoneNumber> phoneNumbers = phoneNumberService.findPhoneNumbersById(phoneNumberList);
+
+        addressService.updateAddresses(addresses, userUpdateDto.getAddressUpdateDtoList());
+        phoneNumberService.updatePhoneNumber(phoneNumbers, userUpdateDto.getPhoneNumberUpdateDtoList());
 
         updateValuesForAppUser(userUpdateDto, appUser);
         return mapAppUserToUserDetailsDto(appUser);
@@ -127,6 +139,15 @@ public class AppUserService implements UserDetailsService {
         appUser.setTaxIdentificationNumber(userUpdateDto.getTaxIdentificationNumber());
     }
 
+    private void checkNameAndEmailIsTaken(String name, String email) {
+        if (appUserRepository.existsByName(name)) {
+            throw new NameAlreadyTakenException(name);
+        }
+        if (appUserRepository.existsByEmail(email)) {
+            throw new EmailAlreadyTakenException(email);
+        }
+    }
+
     private UserDetailsDto mapAppUserToUserDetailsDto(AppUser savedAppUser) {
         return UserDetailsDto.builder()
                 .id(savedAppUser.getId())
@@ -148,7 +169,15 @@ public class AppUserService implements UserDetailsService {
     }
 
     private AppUser mapUserRegisterDtoToAppUser(UserRegisterDto userRegisterDto) {
-        checkEmailOrPhoneNumberIsBlankOrNull(userRegisterDto.getEmail(), userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber());
+        checkEmailOrPhoneNumberIsBlankOrNull(
+                userRegisterDto.getEmail(),
+                /*
+                 * Itt a PhoneNumberRegisterDto-ból kiszedjük a PhoneNumbert-t és String listaként adjuk tovább
+                 */
+                userRegisterDto.getPhoneNumberRegisterDtoList()
+                .stream()
+                        .map(PhoneNumberRegisterDto::getPhoneNumber)
+                        .collect(Collectors.toList()));
 
         AppUser appUser = AppUser.builder()
                 .name(userRegisterDto.getName())
@@ -167,9 +196,14 @@ public class AppUserService implements UserDetailsService {
         return appUser;
     }
 
-    private void checkEmailOrPhoneNumberIsBlankOrNull(String email, String phoneNumber) {
+    private void checkEmailOrPhoneNumberIsBlankOrNull(String email, List<String> phoneNumbers) {
+        /*
+        * Itt megnézzük hogy a beérkező email vagy telefonszámok közül az összes null vagy üres-e.
+        * Ha igen, dobunk egy exception-t
+        */
         if ((email == null || email.isBlank()) &&
-                (phoneNumber == null || phoneNumber.isBlank())) {
+                (phoneNumbers.stream()
+                        .allMatch(phoneNumber -> phoneNumber == null || phoneNumber.isBlank()))) {
             throw new BothEmailAndPhoneNumberCantBeEmptyException("Both Email and Phone Number can't be empty!");
         }
     }
@@ -179,12 +213,16 @@ public class AppUserService implements UserDetailsService {
     }
 
     private void setAppUserPhoneNumber(UserRegisterDto userRegisterDto, AppUser appUser) {
-        appUser.setPhoneNumberList(List.of(
-                new PhoneNumber(userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber(), appUser)));
+        appUser.setPhoneNumberList(userRegisterDto.getPhoneNumberRegisterDtoList()
+                .stream()
+                .map(phoneNumberDto ->
+                        new PhoneNumber(phoneNumberDto.getPhoneNumber(), appUser))
+                .collect(Collectors.toList()));
     }
 
     private void setAppUserAddressList(UserRegisterDto userRegisterDto, AppUser appUser) {
-        appUser.setAddressList(userRegisterDto.getAddressRegisterDtoList().stream()
+        appUser.setAddressList(userRegisterDto.getAddressRegisterDtoList()
+                .stream()
                 .map(addressDto ->
                         new Address(addressDto.getZipCode(),
                                 addressDto.getCity(),
@@ -194,7 +232,7 @@ public class AppUserService implements UserDetailsService {
                 .collect(Collectors.toList()));
     }
 
-    private AppUser findByName(String name) {
+    private AppUser findByNameOrThrowException(String name) {
         AppUser user = appUserRepository.findByName(name);
         if (user == null) {
             throw new UserNotFoundByNameException(name);
