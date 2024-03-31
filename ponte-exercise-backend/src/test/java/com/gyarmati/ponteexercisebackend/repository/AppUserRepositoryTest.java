@@ -46,4 +46,18 @@ public class AppUserRepositoryTest {
         assertThat(foundAppUser).isNotNull();
         assertThat(foundAppUser.getName()).isEqualTo("Parker");
     }
+
+    @Test
+    public void existsByName_returnTrue() {
+        appUserRepository.save(appUser);
+        boolean result = appUserRepository.existsByName("Parker");
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void existsByEmail_returnTrue() {
+        appUserRepository.save(appUser);
+        boolean result = appUserRepository.existsByEmail("peter@gmail.com");
+        assertThat(result).isTrue();
+    }
 }
