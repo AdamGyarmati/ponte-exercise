@@ -2,7 +2,13 @@ package com.gyarmati.ponteexercisebackend.service;
 
 import com.gyarmati.ponteexercisebackend.domain.*;
 import com.gyarmati.ponteexercisebackend.dto.*;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.BothEmailAndPhoneNumberCantBeEmptyException;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.EmailAlreadyTakenException;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.NameAlreadyTakenException;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameException;
 import com.gyarmati.ponteexercisebackend.repository.AppUserRepository;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -117,6 +124,20 @@ public class AppUserServiceTest {
     }
 
     @Test
+    public void registerUser_returnsNameAlreadyTakenException() {
+        when(appUserRepository.existsByName(userRegisterDto.getName())).thenReturn(true);
+
+        assertThrows(NameAlreadyTakenException.class, () -> appUserService.register(userRegisterDto));
+    }
+
+    @Test
+    public void registerUser_returnsEmailAlreadyTakenException() {
+        when(appUserRepository.existsByEmail(userRegisterDto.getEmail())).thenReturn(true);
+
+        assertThrows(EmailAlreadyTakenException.class, () -> appUserService.register(userRegisterDto));
+    }
+
+    @Test
     public void getUserByName_returnsUserDetailsDto() {
         String name = "Peter";
         when(appUserRepository.findByName(name)).thenReturn(appUser);
@@ -158,6 +179,20 @@ public class AppUserServiceTest {
         UserDetailsDto userDetailsDto1 = appUserService.update("Peter", userUpdateDto);
 
         assertThat(userDetailsDto1).isNotNull();
+    }
+
+    @Test
+    public void updateUser_returnsBothEmailAndPhoneNumberCantBeEmptyException() {
+        userUpdateDto.setEmail(null);
+        userUpdateDto.getPhoneNumberUpdateDto().setPhoneNumber(null);
+        assertThrows(BothEmailAndPhoneNumberCantBeEmptyException.class, () -> appUserService.update("Peter", userUpdateDto));
+    }
+
+    @Test
+    public void updateUser_returnsUserNotFoundByNameException() {
+        when(appUserRepository.findByName(userUpdateDto.getName())).thenReturn(null);
+
+        assertThrows(UserNotFoundByNameException.class, () -> appUserService.update(userUpdateDto.getName(), userUpdateDto));
     }
 
     @Test

@@ -57,15 +57,19 @@ public class AppUserService implements UserDetailsService {
     }
 
     public UserDetailsDto register(UserRegisterDto userRegisterDto) {
-        if (appUserRepository.existsByName(userRegisterDto.getName())) {
-            throw new NameAlreadyTakenException(userRegisterDto.getName());
-        }
-        if (appUserRepository.existsByEmail(userRegisterDto.getEmail())) {
-            throw new EmailAlreadyTakenException(userRegisterDto.getEmail());
-        }
+        checkNameAndEmailIsTaken(userRegisterDto.getName(), userRegisterDto.getEmail());
         AppUser appUser = mapUserRegisterDtoToAppUser(userRegisterDto);
         AppUser savedAppUser = appUserRepository.save(appUser);
         return mapAppUserToUserDetailsDto(savedAppUser);
+    }
+
+    private void checkNameAndEmailIsTaken(String name, String email) {
+        if (appUserRepository.existsByName(name)) {
+            throw new NameAlreadyTakenException(name);
+        }
+        if (appUserRepository.existsByEmail(email)) {
+            throw new EmailAlreadyTakenException(email);
+        }
     }
 
     public UserDetailsDto getUserByName(String name) {
@@ -88,11 +92,8 @@ public class AppUserService implements UserDetailsService {
     }
 
     public UserDetailsDto update(String name, UserUpdateDto userUpdateDto) {
-        if ((userUpdateDto.getEmail().isBlank() || userUpdateDto.getEmail() == null) &&
-                (userUpdateDto.getPhoneNumberUpdateDto().getPhoneNumber().isBlank()
-                        || userUpdateDto.getPhoneNumberUpdateDto().getPhoneNumber() == null)) {
-            throw new BothEmailAndPhoneNumberCantBeEmptyException("Both Email and Phone Number can't be empty!");
-        }
+        checkEmailOrPhoneNumberIsBlankOrNull(userUpdateDto.getEmail(), userUpdateDto.getPhoneNumberUpdateDto().getPhoneNumber());
+        checkNameAndEmailIsTaken(userUpdateDto.getName(), userUpdateDto.getEmail());
         AppUser appUser = findByName(name);
         List<Long> addressIdList = userUpdateDto.getAddressUpdateDtoList().stream()
                 .map(AddressUpdateDto::getId)
@@ -147,11 +148,7 @@ public class AppUserService implements UserDetailsService {
     }
 
     private AppUser mapUserRegisterDtoToAppUser(UserRegisterDto userRegisterDto) {
-        if ((userRegisterDto.getEmail().isBlank() || userRegisterDto.getEmail() == null) &&
-                (userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber().isBlank()
-                        || userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber() == null)) {
-            throw new BothEmailAndPhoneNumberCantBeEmptyException("Both Email and Phone Number can't be empty!");
-        }
+        checkEmailOrPhoneNumberIsBlankOrNull(userRegisterDto.getEmail(), userRegisterDto.getPhoneNumberRegisterDto().getPhoneNumber());
 
         AppUser appUser = AppUser.builder()
                 .name(userRegisterDto.getName())
@@ -168,6 +165,13 @@ public class AppUserService implements UserDetailsService {
         setAppUserRoles(appUser);
 
         return appUser;
+    }
+
+    private void checkEmailOrPhoneNumberIsBlankOrNull(String email, String phoneNumber) {
+        if ((email == null || email.isBlank()) &&
+                (phoneNumber == null || phoneNumber.isBlank())) {
+            throw new BothEmailAndPhoneNumberCantBeEmptyException("Both Email and Phone Number can't be empty!");
+        }
     }
 
     private void setAppUserRoles(AppUser appUser) {
