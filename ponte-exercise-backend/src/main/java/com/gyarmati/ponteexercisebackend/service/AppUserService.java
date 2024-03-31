@@ -153,7 +153,7 @@ public class AppUserService implements UserDetailsService {
                 .id(savedAppUser.getId())
                 .name(savedAppUser.getName())
                 .email(savedAppUser.getEmail())
-                .birthDate(savedAppUser.getBirthDate().toString())
+                .birthDate(savedAppUser.getBirthDate() != null ? savedAppUser.getBirthDate().toString() : null)
                 .taxIdentificationNumber(savedAppUser.getTaxIdentificationNumber())
                 .socialSecurityNumber(savedAppUser.getSocialSecurityNumber())
                 .motherName(savedAppUser.getMotherName())
