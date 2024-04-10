@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +26,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @Service
 @Transactional
@@ -33,13 +40,17 @@ public class AppUserService implements UserDetailsService {
     private final AddressService addressService;
     private final PhoneNumberService phoneNumberService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AppUserService(AppUserRepository appUserRepository, AddressService addressService, PhoneNumberService phoneNumberService, @Lazy PasswordEncoder passwordEncoder) {
+    public AppUserService(AppUserRepository appUserRepository, AddressService addressService, PhoneNumberService phoneNumberService, @Lazy PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.appUserRepository = appUserRepository;
         this.addressService = addressService;
         this.phoneNumberService = phoneNumberService;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -49,11 +60,25 @@ public class AppUserService implements UserDetailsService {
         String[] roles = appUser.getAppUserRoleList().stream()
                 .map(appUserRole -> appUserRole.getRole().toString()).toArray(String[]::new);
 
-        return User.builder()
+        UserDetails build = User.builder()
                 .username(appUser.getName())
                 .authorities(AuthorityUtils.createAuthorityList(roles))
                 .password(appUser.getPassword())
                 .build();
+        return build;
+    }
+
+    public JwtResponseDto login(UserLoginDto userLoginDto) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getName(), userLoginDto.getPassword()));
+
+        var user = appUserRepository.findByName(userLoginDto.getName());
+        var accessToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
+
+        JwtResponseDto jwtResponseDto = new JwtResponseDto();
+        jwtResponseDto.setAccessToken(accessToken);
+        jwtResponseDto.setRefreshToken(refreshToken);
+        return jwtResponseDto;
     }
 
     public UserDetailsDto register(UserRegisterDto userRegisterDto) {

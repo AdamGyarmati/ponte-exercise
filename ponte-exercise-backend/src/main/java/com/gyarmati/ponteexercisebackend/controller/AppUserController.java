@@ -1,15 +1,16 @@
 package com.gyarmati.ponteexercisebackend.controller;
 
-import com.gyarmati.ponteexercisebackend.dto.UserDetailsDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterByAdminDto;
-import com.gyarmati.ponteexercisebackend.dto.UserRegisterDto;
-import com.gyarmati.ponteexercisebackend.dto.UserUpdateDto;
+import com.gyarmati.ponteexercisebackend.dto.*;
+import com.gyarmati.ponteexercisebackend.exceptionhandling.UserNotFoundByNameException;
 import com.gyarmati.ponteexercisebackend.service.AppUserService;
+import com.gyarmati.ponteexercisebackend.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,9 +26,11 @@ import static org.springframework.http.HttpStatus.*;
 public class AppUserController {
     private final AppUserService appUserService;
 
+
     @Autowired
     public AppUserController(AppUserService appUserService) {
         this.appUserService = appUserService;
+
     }
 
     @PostMapping("/register")
@@ -45,13 +48,11 @@ public class AppUserController {
         return new ResponseEntity<>(CREATED);
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<UserDetailsDto> login() {
-        log.info("Http request GET /api/users/login");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
-        UserDetailsDto userDetailsDto = appUserService.getUserByName(loggedInUser.getUsername());
-        return new ResponseEntity<>(userDetailsDto, OK);
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponseDto> login(@RequestBody UserLoginDto userLoginDto) {
+        log.info("Http request POST /api/users/login with body: " + userLoginDto);
+        JwtResponseDto responseDto = appUserService.login(userLoginDto);
+        return new ResponseEntity<>(responseDto, OK);
     }
 
     @DeleteMapping
